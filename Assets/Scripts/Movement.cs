@@ -12,46 +12,58 @@ public class Movement : MonoBehaviour
 
     public float speed = 16;
 
-
     //wall prefab.
     public GameObject wallPrefab;
-
     //current wall.
     Collider2D wall;
-
     //last wall's end.
     Vector2 lastWallEnd;
+
+    public MenuFunctionality menuFunctionality;
+
+
+    Vector2 currentDirection;
 
     private void Start()
     {
         //initial velocty 
         GetComponent<Rigidbody2D>().velocity = Vector2.up * speed;
         SpawnWall();
+        currentDirection = Vector2.up;
     }
     void Update()
     {
-        if (Input.GetKeyDown(up))
+        if (!menuFunctionality.IsGamePaused())
         {
-            GetComponent<Rigidbody2D>().velocity = Vector2.up * speed;
-            SpawnWall();
-        }
-        if (Input.GetKeyDown(down))
-        {
-            GetComponent<Rigidbody2D>().velocity = -Vector2.up * speed;
-            SpawnWall();
-        }
-        if (Input.GetKeyDown(left))
-        {
-            GetComponent<Rigidbody2D>().velocity = -Vector2.right * speed;
-            SpawnWall();
-        }
-        if (Input.GetKeyDown(right))
-        {
-            GetComponent<Rigidbody2D>().velocity = Vector2.right * speed;
-            SpawnWall();
-        }
 
-        FitColliderBetween(wall, lastWallEnd, transform.position);
+        
+            if (Input.GetKeyDown(up) && currentDirection != Vector2.down)
+            {
+                currentDirection = Vector2.up;
+                GetComponent<Rigidbody2D>().velocity = currentDirection * speed;
+                SpawnWall();
+            }
+            if (Input.GetKeyDown(down) && currentDirection != Vector2.up)
+            {
+                currentDirection = -Vector2.up;
+                GetComponent<Rigidbody2D>().velocity = currentDirection * speed;
+                SpawnWall();
+            }
+            if (Input.GetKeyDown(left) && currentDirection != Vector2.right)
+            {
+                currentDirection = -Vector2.right;
+                GetComponent<Rigidbody2D>().velocity = currentDirection * speed;
+                SpawnWall();
+            }
+            if (Input.GetKeyDown(right) && currentDirection != Vector2.left)
+            {
+                currentDirection = Vector2.right;
+                GetComponent<Rigidbody2D>().velocity = currentDirection * speed;
+                SpawnWall();
+            }
+
+            FitColliderBetween(wall, lastWallEnd, transform.position);
+            }
     }
 
     void SpawnWall()
@@ -86,7 +98,7 @@ public class Movement : MonoBehaviour
         //not the current wall
         if (co != wall)
         {
-            Debug.Log("Player lost:" + name);
+            menuFunctionality.PlayerDestroyed(name);
             Destroy(gameObject);
         }
     }
